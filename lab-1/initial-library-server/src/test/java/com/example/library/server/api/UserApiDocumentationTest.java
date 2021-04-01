@@ -77,8 +77,7 @@ class UserApiDocumentationTest {
                     .operationPreprocessors()
                     .withRequestDefaults(prettyPrint())
                     .withResponseDefaults(prettyPrint()))
-            .build()
-            .mutateWith(csrf());
+            .build();
   }
 
   @Test
@@ -142,6 +141,7 @@ class UserApiDocumentationTest {
     given(userService.deleteById(userId)).willReturn(Mono.empty());
 
     webTestClient
+        .mutateWith(csrf())
         .delete()
         .uri("/users/{userId}", userId)
         .accept(MediaType.APPLICATION_JSON)
@@ -177,6 +177,7 @@ class UserApiDocumentationTest {
     given(userService.create(any())).willAnswer(i -> Mono.empty());
 
     webTestClient
+        .mutateWith(csrf())
         .post()
         .uri("/users")
         .accept(MediaType.APPLICATION_JSON)

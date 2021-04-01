@@ -69,8 +69,7 @@ class BookApiDocumentationTest {
                     .operationPreprocessors()
                     .withRequestDefaults(prettyPrint())
                     .withResponseDefaults(prettyPrint()))
-            .build()
-            .mutateWith(csrf());
+            .build();
   }
 
   @Test
@@ -155,6 +154,7 @@ class BookApiDocumentationTest {
     given(bookService.deleteById(bookId)).willReturn(Mono.empty());
 
     webTestClient
+        .mutateWith(csrf())
         .delete()
         .uri("/books/{bookId}", bookId)
         .accept(MediaType.APPLICATION_JSON)
@@ -176,6 +176,7 @@ class BookApiDocumentationTest {
     UUID bookId = UUID.randomUUID();
 
     webTestClient
+        .mutateWith(csrf())
         .post()
         .uri("/books/{bookId}/borrow", bookId)
         .accept(MediaType.APPLICATION_JSON)
@@ -197,6 +198,7 @@ class BookApiDocumentationTest {
     UUID bookId = UUID.randomUUID();
 
     webTestClient
+        .mutateWith(csrf())
         .post()
         .uri("/books/{bookId}/return", bookId)
         .accept(MediaType.APPLICATION_JSON)
@@ -232,6 +234,7 @@ class BookApiDocumentationTest {
     given(bookService.create(any())).willAnswer(b -> Mono.empty());
 
     webTestClient
+        .mutateWith(csrf())
         .post()
         .uri("/books")
         .accept(MediaType.APPLICATION_JSON)
