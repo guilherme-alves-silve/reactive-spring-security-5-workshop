@@ -40,13 +40,13 @@ public class BookService {
         .findById(bookIdentifier)
         .log()
         .flatMap(
-            b ->
+            book ->
                 userRepository
                     .findById(userIdentifier)
                     .flatMap(
-                        u -> {
-                          b.doBorrow(u);
-                          return bookRepository.save(b).then();
+                        user -> {
+                          book.doBorrow(user);
+                          return bookRepository.save(book).then();
                         })
                     .switchIfEmpty(Mono.empty()))
         .switchIfEmpty(Mono.empty());
@@ -62,13 +62,13 @@ public class BookService {
         .findById(bookIdentifier)
         .log()
         .flatMap(
-            b ->
+            book ->
                 userRepository
                     .findById(userIdentifier)
                     .flatMap(
-                        u -> {
-                          b.doReturn(u);
-                          return bookRepository.save(b).then();
+                        user -> {
+                          book.doReturn(user);
+                          return bookRepository.save(book).then();
                         })
                     .switchIfEmpty(Mono.empty()))
         .switchIfEmpty(Mono.empty());

@@ -30,7 +30,7 @@ public class UserHandler {
   }
 
   public Mono<ServerResponse> getAllUsers(ServerRequest request) {
-    return ok().contentType(MediaType.APPLICATION_JSON_UTF8)
+    return ok().contentType(MediaType.APPLICATION_JSON)
         .body(userService.findAll().map(userResourceAssembler::toResource), UserResource.class);
   }
 
@@ -40,8 +40,8 @@ public class UserHandler {
         .map(userResourceAssembler::toResource)
         .flatMap(
             ur ->
-                ok().contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .body(BodyInserters.fromObject(ur)))
+                ok().contentType(MediaType.APPLICATION_JSON)
+                    .body(BodyInserters.fromValue(ur)))
         .switchIfEmpty(notFound().build());
   }
 

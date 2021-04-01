@@ -41,7 +41,7 @@ public class UserHandler {
         .flatMap(
             ur ->
                 ok().contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .body(BodyInserters.fromObject(ur)))
+                    .body(BodyInserters.fromValue(ur)))
         .switchIfEmpty(notFound().build());
   }
 

@@ -244,7 +244,7 @@ class BookApiDocumentationTest {
         .uri("/books")
         .accept(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
-        .body(BodyInserters.fromObject(new ObjectMapper().writeValueAsString(bookResource)))
+        .body(BodyInserters.fromValue(new ObjectMapper().writeValueAsString(bookResource)))
         .exchange()
         .expectStatus()
         .isCreated()

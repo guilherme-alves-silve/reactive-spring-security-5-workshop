@@ -167,7 +167,7 @@ class UserApiAuthenticationTest {
           .uri("/users")
           .accept(MediaType.APPLICATION_JSON)
           .contentType(MediaType.APPLICATION_JSON)
-          .body(BodyInserters.fromObject(new ObjectMapper().writeValueAsString(userResource)))
+          .body(BodyInserters.fromValue(new ObjectMapper().writeValueAsString(userResource)))
           .exchange()
           .expectStatus()
           .isOk();
@@ -245,7 +245,7 @@ class UserApiAuthenticationTest {
           .uri("/users")
           .accept(MediaType.APPLICATION_JSON)
           .contentType(MediaType.APPLICATION_JSON)
-          .body(BodyInserters.fromObject(new ObjectMapper().writeValueAsString(userResource)))
+          .body(BodyInserters.fromValue(new ObjectMapper().writeValueAsString(userResource)))
           .exchange()
           .expectStatus()
           .isUnauthorized();
