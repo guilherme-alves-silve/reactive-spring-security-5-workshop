@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -28,6 +31,8 @@ public class DataInitializer implements CommandLineRunner {
       UUID.fromString("40c5ad0d-41f7-494b-8157-33fad16012aa");
   private static final UUID ADMIN_IDENTIFIER =
       UUID.fromString("0d2c04f1-e25f-41b5-b4cd-3566a081200f");
+  private static final UUID ENCRYPT_UPGRADE_USER_IDENTIFIER =
+          UUID.fromString("a7365322-0aac-4602-83b6-380bccb786e2");
 
   private static final UUID BOOK_CLEAN_CODE_IDENTIFIER =
       UUID.fromString("f9bf70d6-e56d-4cab-be6b-294cd05f599f");
@@ -40,11 +45,15 @@ public class DataInitializer implements CommandLineRunner {
 
   private final BookRepository bookRepository;
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Autowired
-  public DataInitializer(BookRepository bookRepository, UserRepository userRepository) {
+  public DataInitializer(final BookRepository bookRepository,
+                         final UserRepository userRepository,
+                         final PasswordEncoder passwordEncoder) {
     this.bookRepository = bookRepository;
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Override
@@ -53,8 +62,13 @@ public class DataInitializer implements CommandLineRunner {
     createBooks();
   }
 
+  @SuppressWarnings("deprecated")
   private void createUsers() {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    //Used MD5 on purpose so we can use the automatic upgrade of password hashing, in Spring
+    final DelegatingPasswordEncoder oldPasswordEncoder =
+            new DelegatingPasswordEncoder("MD5", Collections.singletonMap("MD5", new MessageDigestPasswordEncoder("MD5")));
 
     logger.info("Creating users with LIBRARY_USER, LIBRARY_CURATOR and LIBRARY_ADMIN roles...");
     userRepository
@@ -63,33 +77,42 @@ public class DataInitializer implements CommandLineRunner {
                 new User(
                     USER_WAYNE_IDENTIFIER,
                     "bruce.wayne@example.com",
-                    "wayne",
+                    passwordEncoder.encode("wayne"),
                     "Bruce",
                     "Wayne",
                     Collections.singletonList(Role.LIBRARY_USER)),
                 new User(
                     USER_BANNER_IDENTIFIER,
                     "bruce.banner@example.com",
-                    "banner",
+                    passwordEncoder.encode("banner"),
                     "Bruce",
                     "Banner",
                     Collections.singletonList(Role.LIBRARY_USER)),
                 new User(
                     CURATOR_IDENTIFIER,
                     "peter.parker@example.com",
-                    "parker",
+                    passwordEncoder.encode("parker"),
                     "Peter",
                     "Parker",
                     Collections.singletonList(Role.LIBRARY_CURATOR)),
                 new User(
                     ADMIN_IDENTIFIER,
                     "clark.kent@example.com",
-                    "kent",
+                    passwordEncoder.encode("kent"),
                     "Clark",
                     "Kent",
-                    Collections.singletonList(Role.LIBRARY_ADMIN))))
+                    Collections.singletonList(Role.LIBRARY_ADMIN)),
+                new User(
+                    ENCRYPT_UPGRADE_USER_IDENTIFIER,
+                    "old@example.com",
+                    oldPasswordEncoder.encode("user"),
+                    "Library",
+                    "OldEncryption",
+                    Collections.singletonList(Role.LIBRARY_USER)
+                )))
+        .log()
         .then(userRepository.count())
-        .subscribe(c -> logger.info("{} users created", c));
+        .subscribe(count -> logger.info("{} users created", count));
   }
 
   private void createBooks() {
@@ -157,6 +180,6 @@ public class DataInitializer implements CommandLineRunner {
                     .flatMap(bookRepository::save)
                     .then(bookRepository.count()))
         .subscribe(
-            c -> logger.info("{} books created", c), t -> logger.error("Error {}", t.getMessage()));
+            count -> logger.info("{} books created", count), throwable -> logger.error("Error {}", throwable.getMessage()));
   }
 }

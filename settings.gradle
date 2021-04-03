@@ -18,5 +18,3 @@ include 'lab-5:complete-resource-server'
 include 'lab-6:initial-oidc-client'
 include 'lab-6:complete-oidc-client'
 include 'workshop-docs'
-
-
