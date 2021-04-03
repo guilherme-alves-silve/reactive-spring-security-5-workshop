@@ -21,6 +21,7 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(final ServerHttpSecurity httpSecurity) {
         return httpSecurity
+                .csrf().disable()
                 .authorizeExchange()
                     .matchers(PathRequest.toStaticResources().atCommonLocations())
                     .permitAll()
