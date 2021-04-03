@@ -93,7 +93,7 @@ If you have Docker installed then setting up Keycloak is quite easy.
 To configure and run Keycloak using docker
 
 1. Open a new command line terminal window
-2. Change directory to subdirectory _setup_keycloak_ of the workshop repository
+2. Change directory to subdirectory _setup_ of the workshop repository
 3. Open and edit the script _run_keycloak_docker.sh_ or _run_keycloak_docker.bat_ (depending on your OS) and adapt the value for _WORKSHOP_HOME_ to your local workshop repository directory
 4. Save and execute the script _run_keycloak_docker.sh_ or _run_keycloak_docker.bat_ (depending on your OS)
 
@@ -113,12 +113,12 @@ To set up [Keycloak](https://keycloak.org):
 This workshop requires a pre-defined configuration for Keycloak (i.e. some OAuth2/OpenID Connect clients, and user accounts).
 
 To configure Keycloak you need to have checked out the GIT repository for this workshop.
-All you need to configure Keycloak is located in the subdirectory _setup_keycloak_ of the repository.
+All you need to configure Keycloak is located in the subdirectory _setup_ of the repository.
 
-1. Change into the subdirectory _setup_keycloak_ of the workshop git repository
-2. Open the file __import_keycloak_realm.sh__ or __import_keycloak_realm.bat__ (depending on your OS) in the _setup_keycloak_ subdirectory 
+1. Change into the subdirectory _setup_ of the workshop git repository
+2. Open the file __import_keycloak_realm.sh__ or __import_keycloak_realm.bat__ (depending on your OS) in the _setup_ subdirectory 
    and change the value of the environment variable _KEYCLOAK_HOME_ to your __<KEYCLOAK_INSTALL_DIR>__ of step 2 and save the file
-3. Now open a new command-line terminal window, change into the subdirectory _setup_keycloak_ again and execute the provided script
+3. Now open a new command-line terminal window, change into the subdirectory _setup_ again and execute the provided script
    __import_keycloak_realm.sh__ or __import_keycloak_realm.bat__ (depending on your OS). 
    This starts a standalone Keycloak instance and automatically imports the required configuration.
 4. Wait until the import has finished (look for a line like _Started 590 of 885 services_) then 

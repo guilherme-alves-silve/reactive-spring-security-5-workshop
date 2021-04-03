@@ -34,18 +34,18 @@ public class CodeCallbackController {
       Model model) {
 
     if (StringUtils.isNotBlank(code) && StringUtils.isNotBlank(state)) {
-      model.addAttribute("token_endpoint", tokenEndpointUrl.toString());
-      model.addAttribute("grant_type", "authorization_code");
-      model.addAttribute("code", code);
-      model.addAttribute("state", state);
-      model.addAttribute("redirect_uri", redirectUri.toString());
-      model.addAttribute("client_id", clientid);
-      model.addAttribute("client_secret", clientSecret);
-      model.addAttribute("tokenRequest", new TokenRequest());
+      model.addAttribute("token_endpoint", tokenEndpointUrl.toString())
+        .addAttribute("grant_type", "authorization_code")
+        .addAttribute("code", code)
+        .addAttribute("state", state)
+        .addAttribute("redirect_uri", redirectUri.toString())
+        .addAttribute("client_id", clientid)
+        .addAttribute("client_secret", clientSecret)
+        .addAttribute("tokenRequest", new TokenRequest());
       return "authcode";
     } else {
-      model.addAttribute("error", error);
-      model.addAttribute("error_description", error_description);
+      model.addAttribute("error", error)
+        .addAttribute("error_description", error_description);
       return "error";
     }
   }

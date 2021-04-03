@@ -42,21 +42,16 @@ public class TokenRequestController {
       throws URISyntaxException {
     model.addAttribute("token_endpoint", tokenEndpointUrl.toString());
     String tokenRequestBody =
-        "grant_type=authorization_code&code="
-            + code
-            + "&state="
-            + state
-            + "&redirect_uri="
-            + redirectUri.toString()
-            + "&client_id="
-            + clientid
-            + "&client_secret="
-            + clientSecret;
+            "grant_type=authorization_code" +
+            "&code=" + code +
+            "&state=" + state +
+            "&redirect_uri=" + redirectUri.toString() +
+            "&client_id=" + clientid +
+            "&client_secret=" + clientSecret;
 
     return performTokenRequest(model, tokenRequestBody)
-        .map(
-            r -> {
-              if (r) {
+        .map(validToken -> {
+              if (validToken) {
                 return "access-token";
               } else {
                 return "error";
@@ -69,17 +64,14 @@ public class TokenRequestController {
       @RequestParam("refresh_token") String refreshToken, Model model) throws URISyntaxException {
     model.addAttribute("token_endpoint", tokenEndpointUrl.toString());
     String tokenRequestBody =
-        "grant_type=refresh_token&refresh_token="
-            + refreshToken
-            + "&client_id="
-            + clientid
-            + "&client_secret="
-            + clientSecret;
+            "grant_type=refresh_token" +
+            "&refresh_token=" + refreshToken +
+            "&client_id=" + clientid +
+            "&client_secret=" + clientSecret;
 
     return performTokenRequest(model, tokenRequestBody)
-        .map(
-            r -> {
-              if (r) {
+        .map(validToken -> {
+              if (validToken) {
                 model.addAttribute("refresh_token", refreshToken);
                 return "access-token";
               } else {
@@ -99,32 +91,30 @@ public class TokenRequestController {
         .retrieve()
         .bodyToMono(TokenResponse.class)
         .flatMap(
-            tr -> {
-              model.addAttribute("access_token", tr.getAccess_token());
-              model.addAttribute(
-                  "refresh_token", tr.getRefresh_token() != null ? tr.getRefresh_token() : "");
-              model.addAttribute("scope", tr.getScope() != null ? tr.getScope() : "");
-              model.addAttribute("expires_in", tr.getExpires_in());
-              model.addAttribute("token_type", tr.getToken_type());
-              JsonWebToken jwt = new JsonWebToken(tr.getAccess_token());
+            tokenResponse -> {
+              model.addAttribute("access_token", tokenResponse.getAccessToken())
+                .addAttribute("refresh_token", tokenResponse.getRefreshToken() != null ? tokenResponse.getRefreshToken() : "")
+                .addAttribute("scope", tokenResponse.getScope() != null ? tokenResponse.getScope() : "")
+                .addAttribute("expires_in", tokenResponse.getExpiresIn())
+                .addAttribute("token_type", tokenResponse.getTokenType());
+              JsonWebToken jwt = new JsonWebToken(tokenResponse.getAccessToken());
               if (jwt.isJwt()) {
-                model.addAttribute("jwt_header", jwt.getHeader());
-                model.addAttribute("jwt_payload", jwt.getPayload());
-                model.addAttribute("jwt_signature", jwt.getSignature());
+                model.addAttribute("jwt_header", jwt.getHeader())
+                    .addAttribute("jwt_payload", jwt.getPayload())
+                    .addAttribute("jwt_signature", jwt.getSignature());
               } else {
-                model.addAttribute("jwt_header", "--");
-                model.addAttribute("jwt_payload", "--");
-                model.addAttribute("jwt_signature", "--");
+                model.addAttribute("jwt_header", "--")
+                    .addAttribute("jwt_payload", "--")
+                    .addAttribute("jwt_signature", "--");
               }
               return Mono.just(true);
             })
         .onErrorResume(
-            p -> p instanceof WebClientResponseException,
-            t -> {
-              model.addAttribute("error", "Error getting token");
-              model.addAttribute(
-                  "error_description", ((WebClientResponseException) t).getResponseBodyAsString());
+            throwable -> throwable instanceof WebClientResponseException,
+            throwable -> {
+              model.addAttribute("error", "Error getting token")
+                .addAttribute("error_description", ((WebClientResponseException) throwable).getResponseBodyAsString());
               return Mono.just(false);
-            });
+        });
   }
 }

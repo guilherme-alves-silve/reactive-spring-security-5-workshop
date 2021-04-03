@@ -1,9 +1,10 @@
 package com.example.authorizationcode.client.jwt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -17,6 +18,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * There is no check of the signature included (which is a must have in productive code)
  * */
 public class JsonWebToken {
+
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+          .configure(SerializationFeature.INDENT_OUTPUT, true);
+  private static final Base64.Decoder DECODER = Base64.getDecoder();
+  private static final Logger LOGGER = LoggerFactory.getLogger(JsonWebToken.class);
 
   private String base64Header;
   private String base64Payload;
@@ -41,17 +47,17 @@ public class JsonWebToken {
   }
 
   public String getHeader() {
-    return new String(Base64.getDecoder().decode(base64Header), UTF_8);
+    return new String(DECODER.decode(base64Header), UTF_8);
   }
 
   public String getPayload() {
-    String raw_json = new String(Base64.getDecoder().decode(base64Payload), UTF_8);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+    String rawJson = new String(DECODER.decode(base64Payload), UTF_8);
     try {
-      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readValue(raw_json, Object.class));
+      return MAPPER.writerWithDefaultPrettyPrinter()
+              .writeValueAsString(MAPPER.readValue(rawJson, Object.class));
     } catch (IOException e) {
-      return raw_json;
+      LOGGER.error("Error: {}", e.getMessage());
+      return rawJson;
     }
   }
 

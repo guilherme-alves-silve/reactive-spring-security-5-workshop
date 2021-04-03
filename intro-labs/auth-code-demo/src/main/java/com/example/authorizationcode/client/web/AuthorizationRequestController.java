@@ -34,7 +34,7 @@ public class AuthorizationRequestController {
   private URI redirectUri;
 
   @Value("${democlient.authorization.scope}")
-  private List<String> scope = new ArrayList<>();
+  private final List<String> scope;
 
   private final WebClient webClient;
 
@@ -42,16 +42,17 @@ public class AuthorizationRequestController {
 
   public AuthorizationRequestController(WebClient webClient) {
     this.webClient = webClient;
+    this.scope = new ArrayList<>();
   }
 
   @GetMapping("/")
   public String initiateAuthRequest(Model model) throws UnsupportedEncodingException {
 
-    model.addAttribute("authorization_endpoint", authorizationEndpointUrl.toString());
-    model.addAttribute("client_id", clientid);
-    model.addAttribute("response_type", responseType);
-    model.addAttribute("redirect_uri", redirectUri.toString());
-    model.addAttribute("scope", String.join(" ", scope));
+    model.addAttribute("authorization_endpoint", authorizationEndpointUrl.toString())
+      .addAttribute("client_id", clientid)
+      .addAttribute("response_type", responseType)
+      .addAttribute("redirect_uri", redirectUri.toString())
+      .addAttribute("scope", String.join(" ", scope));
 
     String randomState = generateRandomState();
     model.addAttribute("state", randomState);
@@ -65,11 +66,13 @@ public class AuthorizationRequestController {
   @GetMapping("/authrequest")
   @ResponseBody
   public Mono<ResponseEntity<String>> performAuthRequest() {
+
     return webClient
-        .get()
-        .uri(authorizationRequest)
-        .exchange()
-        .map(cr -> ResponseEntity.status(cr.statusCode()).body(cr.statusCode().getReasonPhrase()));
+            .get()
+            .uri(authorizationRequest)
+            .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode()))
+            .map(statusCode -> ResponseEntity.status(statusCode)
+                    .body(statusCode.getReasonPhrase()));
   }
 
   private String generateRandomState() throws UnsupportedEncodingException {
@@ -77,17 +80,11 @@ public class AuthorizationRequestController {
   }
 
   private void createAuthorizationRequest(String randomState) throws UnsupportedEncodingException {
-    authorizationRequest =
-        authorizationEndpointUrl.toString()
-            + "?response_type="
-            + responseType
-            + "&client_id="
-            + URLEncoder.encode(clientid, "UTF-8")
-            + "&state="
-            + randomState
-            + "&scope="
-            + URLEncoder.encode(String.join(" ", scope), "UTF-8")
-            + "&redirect_uri="
-            + URLEncoder.encode(redirectUri.toString(), "UTF-8");
+    authorizationRequest = authorizationEndpointUrl.toString() +
+            "?response_type=" + responseType +
+            "&client_id=" + URLEncoder.encode(clientid, "UTF-8") +
+            "&state=" + randomState +
+            "&scope=" + URLEncoder.encode(String.join(" ", scope), "UTF-8") +
+            "&redirect_uri=" + URLEncoder.encode(redirectUri.toString(), "UTF-8");
   }
 }

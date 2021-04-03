@@ -19,6 +19,9 @@ import java.net.URL;
 @Controller
 public class TokenIntrospectionController {
 
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+          .configure(SerializationFeature.INDENT_OUTPUT, true);
+
   private final WebClient webClient;
 
   @Value("${democlient.introspection.endpoint}")
@@ -39,13 +42,10 @@ public class TokenIntrospectionController {
       throws URISyntaxException {
     model.addAttribute("token_introspection_endpoint", tokenIntrospectionEndpointUrl.toString());
     String tokenRequestBody =
-        "token="
-            + accessToken
+              "token=" + accessToken
             + "&token_type_hint=access_token"
-            + "&client_id="
-            + clientid
-            + "&client_secret="
-            + clientSecret;
+            + "&client_id=" + clientid
+            + "&client_secret=" + clientSecret;
 
     return performTokenIntrospectionRequest(model, tokenRequestBody);
   }
@@ -60,26 +60,22 @@ public class TokenIntrospectionController {
         .body(Mono.just(tokenRequestBody), String.class)
         .retrieve()
         .bodyToMono(String.class)
-        .map(
-            s -> {
-              model.addAttribute("introspection_response", prettyJson(s));
-              return "introspection";
-            })
+        .map(tokenRequestBodyStr -> {
+            model.addAttribute("introspection_response", prettyJson(tokenRequestBodyStr));
+            return "introspection";
+        })
         .onErrorResume(
-            p -> p instanceof WebClientResponseException,
-            t -> {
+          throwable -> throwable instanceof WebClientResponseException,
+          throwable -> {
               model.addAttribute("error", "Error getting token");
-              model.addAttribute(
-                  "error_description", ((WebClientResponseException) t).getResponseBodyAsString());
+              model.addAttribute("error_description", ((WebClientResponseException) throwable).getResponseBodyAsString());
               return Mono.just("error");
-            });
+        });
   }
 
   private String prettyJson(String raw) {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     try {
-      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readValue(raw, Object.class));
+      return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(MAPPER.readValue(raw, Object.class));
     } catch (IOException e) {
       return raw;
     }

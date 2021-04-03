@@ -1,62 +1,77 @@
 package com.example.authorizationcode.client.web;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TokenResponse {
 
-  private String access_token;
-  private String refresh_token;
-  private int expires_in;
-  private String token_type;
+  @JsonProperty("access_token")
+  private String accessToken;
+
+  @JsonProperty("refresh_token")
+  private String refreshToken;
+
+  @JsonProperty("expires_in")
+  private int expiresIn;
+
+  @JsonProperty("token_type")
+  private String tokenType;
+
   private String scope;
 
-  public String getAccess_token() {
-    return access_token;
+  public String getAccessToken() {
+    return accessToken;
   }
 
   public String getDecodedAccessToken() {
-    if (getAccess_token() != null) {
-      return new String(Base64.getDecoder().decode(getAccess_token()), UTF_8);
+    if (getAccessToken() != null) {
+      return new String(Base64.getDecoder().decode(getAccessToken()), UTF_8);
     } else {
       return "N/A";
     }
   }
 
-  public void setAccess_token(String access_token) {
-    this.access_token = access_token;
+  public TokenResponse setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+    return this;
   }
 
-  public String getRefresh_token() {
-    return refresh_token;
+  public String getRefreshToken() {
+    return refreshToken;
   }
 
-  public void setRefresh_token(String refresh_token) {
-    this.refresh_token = refresh_token;
+  public TokenResponse setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
+    return this;
   }
 
-  public int getExpires_in() {
-    return expires_in;
+  public int getExpiresIn() {
+    return expiresIn;
   }
 
-  public void setExpires_in(int expires_in) {
-    this.expires_in = expires_in;
+  public TokenResponse setExpiresIn(int expiresIn) {
+    this.expiresIn = expiresIn;
+    return this;
   }
 
-  public String getToken_type() {
-    return token_type;
+  public String getTokenType() {
+    return tokenType;
   }
 
-  public void setToken_type(String token_type) {
-    this.token_type = token_type;
+  public TokenResponse setTokenType(String tokenType) {
+    this.tokenType = tokenType;
+    return this;
   }
 
   public String getScope() {
     return scope;
   }
 
-  public void setScope(String scope) {
+  public TokenResponse setScope(String scope) {
     this.scope = scope;
+    return this;
   }
 }
