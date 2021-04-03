@@ -2,6 +2,7 @@ package com.example.library.server.business;
 
 import com.example.library.server.InitialLibraryServerApplication;
 import com.example.library.server.common.Role;
+import com.example.library.server.dataaccess.BookRepository;
 import com.example.library.server.dataaccess.User;
 import com.example.library.server.dataaccess.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -17,8 +18,8 @@ import reactor.test.StepVerifier;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.mockito.BDDMockito.anyString;
-import static org.mockito.BDDMockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Verify that user service")
 @SpringJUnitConfig(InitialLibraryServerApplication.class)
@@ -26,6 +27,9 @@ public class UserServiceAuthorizationTest {
 
     @Autowired
     private UserService userService;
+
+    @MockBean
+    private BookRepository bookRepository;
 
     @MockBean
     private UserRepository userRepository;
