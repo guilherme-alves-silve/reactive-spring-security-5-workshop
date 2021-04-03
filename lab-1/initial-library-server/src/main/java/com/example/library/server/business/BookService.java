@@ -19,7 +19,8 @@ public class BookService {
   private final UserRepository userRepository;
 
   @Autowired
-  public BookService(BookRepository bookRepository, UserRepository userRepository) {
+  public BookService(final BookRepository bookRepository,
+                     final UserRepository userRepository) {
     this.bookRepository = bookRepository;
     this.userRepository = userRepository;
   }
@@ -29,7 +30,6 @@ public class BookService {
     return bookRepository.insert(book).then();
   }
 
-  @PreAuthorize("hasRole('LIBRARY_CURATOR')")
   public Mono<Book> findById(UUID uuid) {
     return bookRepository.findById(uuid);
   }
@@ -84,6 +84,7 @@ public class BookService {
     return bookRepository.findAll();
   }
 
+  @PreAuthorize("hasRole('LIBRARY_CURATOR')")
   public Mono<Void> deleteById(UUID bookIdentifier) {
     return bookRepository.deleteById(bookIdentifier).then();
   }

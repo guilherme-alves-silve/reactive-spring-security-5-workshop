@@ -5,6 +5,7 @@ import org.springframework.boot.actuate.autoconfigure.security.reactive.Endpoint
 import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -16,42 +17,42 @@ import org.springframework.security.web.server.authentication.logout.ServerLogou
 import java.net.URI;
 
 @EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 public class WebSecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(final ServerHttpSecurity httpSecurity) {
         return httpSecurity
-                .csrf().disable()
-                .authorizeExchange()
-                    .matchers(PathRequest.toStaticResources().atCommonLocations())
-                    .permitAll()
-                    .matchers(EndpointRequest.to("health"))
-                    .permitAll()
-                    .matchers(EndpointRequest.to("info"))
-                    .permitAll()
-                    .matchers(EndpointRequest.toAnyEndpoint())
-                    .hasRole(Role.LIBRARY_ADMIN.name())
-                    .pathMatchers(HttpMethod.POST, "/books/{bookId}/borrow")
-                    .hasRole(Role.LIBRARY_USER.name())
-                    .pathMatchers(HttpMethod.POST, "/books/{bookId}/return")
-                    .hasRole(Role.LIBRARY_USER.name())
-                    .pathMatchers(HttpMethod.POST, "/books")
-                    .hasRole(Role.LIBRARY_CURATOR.name())
-                    .pathMatchers(HttpMethod.DELETE, "/books")
-                    .hasRole(Role.LIBRARY_CURATOR.name())
-                    .pathMatchers("/users/**")
-                    .hasRole(Role.LIBRARY_ADMIN.name())
-                    .anyExchange()
-                    .authenticated()
-                    .and()
-                    .httpBasic()
-                    .and()
-                    .formLogin()
-                    .and()
-                    .logout()
-                    .logoutSuccessHandler(logoutSuccessHandler())
-                    .and()
-                    .build();
+            .authorizeExchange()
+            .matchers(PathRequest.toStaticResources().atCommonLocations())
+            .permitAll()
+            .matchers(EndpointRequest.to("health"))
+            .permitAll()
+            .matchers(EndpointRequest.to("info"))
+            .permitAll()
+            .matchers(EndpointRequest.toAnyEndpoint())
+            .hasRole(Role.LIBRARY_ADMIN.name())
+            .pathMatchers(HttpMethod.POST, "/books/{bookId}/borrow")
+            .hasRole(Role.LIBRARY_USER.name())
+            .pathMatchers(HttpMethod.POST, "/books/{bookId}/return")
+            .hasRole(Role.LIBRARY_USER.name())
+            .pathMatchers(HttpMethod.POST, "/books")
+            .hasRole(Role.LIBRARY_CURATOR.name())
+            .pathMatchers(HttpMethod.DELETE, "/books")
+            .hasRole(Role.LIBRARY_CURATOR.name())
+            .pathMatchers("/users/**")
+            .hasRole(Role.LIBRARY_ADMIN.name())
+            .anyExchange()
+            .authenticated()
+            .and()
+            .httpBasic()
+            .and()
+            .formLogin()
+            .and()
+            .logout()
+            .logoutSuccessHandler(logoutSuccessHandler())
+            .and()
+            .build();
     }
 
     @Bean
