@@ -18,19 +18,19 @@ public class UserRouter {
 
     return RouterFunctions.route(
             RequestPredicates.GET("/users")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON_UTF8)),
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
             userHandler::getAllUsers)
         .andRoute(
             RequestPredicates.GET("/users/{userId}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON_UTF8)),
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
             userHandler::getUser)
         .andRoute(
             RequestPredicates.POST("/users")
-                .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON_UTF8)),
+                .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)),
             userHandler::createUser)
         .andRoute(
             RequestPredicates.DELETE("/users/{userId}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON_UTF8)),
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
             userHandler::deleteUser);
   }
 }
