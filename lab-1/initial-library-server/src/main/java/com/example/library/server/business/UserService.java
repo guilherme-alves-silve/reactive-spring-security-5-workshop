@@ -3,6 +3,7 @@ package com.example.library.server.business;
 import com.example.library.server.dataaccess.User;
 import com.example.library.server.dataaccess.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Service
+@PreAuthorize("hasRole('LIBRARY_ADMIN')")
 public class UserService {
 
   private final UserRepository userRepository;
@@ -19,6 +21,7 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
+  @PreAuthorize("isAnonymous() or isAuthenticated()")
   public Mono<User> findOneByEmail(String email) {
     return userRepository.findOneByEmail(email);
   }
